@@ -3,276 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>🚀 Juego Espacial 3D — Neon Arcade</title>
+    <title>🚀 Juego Espacial 3D — Listo para jugar</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-        }
-
-        html, body {
-            background: #000;
-            color: #00ffff;
-            font-family: 'Courier New', monospace;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            position: fixed;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; touch-action: manipulation; }
+        body { background: #000; color: #00ffff; font-family: Arial, sans-serif; height: 100vh; width: 100vw; overflow: hidden; }
+        
         #game-container {
             position: relative;
             width: 100%;
             height: 100%;
-            max-width: 520px;
-            max-height: 920px;
+            max-width: 500px;
+            max-height: 900px;
             margin: 0 auto;
             background: radial-gradient(ellipse at center, #0f1628 0%, #000510 60%, #000 100%);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            overflow: hidden;
-            border: 3px solid transparent;
+            border: 3px solid;
             border-image: linear-gradient(135deg, #00ffff, #ff00ff, #00ffff) 1;
-            box-shadow: 
-                0 0 40px rgba(0, 255, 255, 0.3),
-                0 0 80px rgba(255, 0, 255, 0.15),
-                inset 0 0 60px rgba(0, 255, 255, 0.05);
+            box-shadow: 0 0 30px rgba(0,255,255,0.3);
         }
 
-        @media (min-width: 521px) {
-            #game-container {
-                height: 95vh;
-                border-radius: 20px;
-            }
-        }
-
-        /* PANTALLAS DE INICIO Y FIN */
-        #start-screen, #gameover-screen {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at center, rgba(10, 0, 30, 0.98), rgba(0, 0, 0, 0.95));
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            gap: 25px;
-            padding: 20px;
-        }
-
-        #gameover-screen { display: none; }
-
-        .titulo {
-            font-size: clamp(1.8rem, 6vw, 2.8rem);
-            background: linear-gradient(90deg, #00ffff, #ff00ff, #00ffff);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 0 30px rgba(0,255,255,0.5), 0 0 60px rgba(255,0,255,0.3);
-            text-align: center;
-            animation: brillo 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes brillo {
-            from { filter: drop-shadow(0 0 10px #00ffff); }
-            to { filter: drop-shadow(0 0 25px #ff00ff); }
-        }
-
-        .subtitulo {
-            font-size: clamp(0.9rem, 3vw, 1.1rem);
-            color: #ffccff;
-            text-align: center;
-            text-shadow: 0 0 10px #ff00ff;
-        }
-
-        .record {
-            font-size: clamp(1.1rem, 3.5vw, 1.3rem);
-            color: #ffff00;
-            margin-top: 10px;
-            text-shadow: 0 0 15px #ffff00;
-        }
-
-        .boton-inicio {
-            background: linear-gradient(135deg, #00ffff, #0088ff, #ff00ff);
-            border: none;
-            color: #000;
-            padding: 18px 50px;
-            font-size: clamp(1.1rem, 4vw, 1.4rem);
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 
-                0 0 20px #00ffff,
-                0 0 40px rgba(255, 0, 255, 0.4),
-                inset 0 0 15px rgba(255,255,255,0.3);
-            transition: all 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .boton-inicio:hover, .boton-inicio:active { 
-            transform: scale(1.08); 
-            box-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff;
-        }
-
-        .aviso-nivel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: clamp(2rem, 9vw, 3rem);
-            color: #ffff00;
-            text-shadow: 
-                0 0 20px #ffff00,
-                0 0 40px #ff8800,
-                0 0 60px #ff4400;
-            z-index: 50;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-            font-weight: bold;
-            letter-spacing: 3px;
-        }
-
-        /* HUD Superior 3D Neon */
+        /* HUD */
         #hud {
             display: flex;
             justify-content: space-between;
-            padding: 10px 14px;
-            background: linear-gradient(180deg, rgba(0,20,40,0.95), rgba(0,10,30,0.9));
-            border: 2px solid #00ffff;
-            border-radius: 12px;
-            margin: 8px;
-            font-size: clamp(0.8rem, 2.5vw, 0.95rem);
+            padding: 10px 15px;
+            background: rgba(0,20,40,0.9);
+            border-bottom: 2px solid #00ffff;
+            font-size: 16px;
             font-weight: bold;
-            z-index: 10;
-            flex-shrink: 0;
-            flex-wrap: wrap;
-            gap: 8px;
-            box-shadow: 
-                0 0 15px rgba(0,255,255,0.4),
-                inset 0 0 10px rgba(0,255,255,0.1);
-            text-shadow: 0 0 8px currentColor;
+            text-shadow: 0 0 10px currentColor;
         }
+        .puntos { color: #00ff88; }
+        .nivel { color: #ffff00; }
+        .vida { color: #ff4466; }
 
-        .hud-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
+        /* Canvas */
+        #gameCanvas { flex: 1; display: block; width: 100%; }
 
-        .puntos { color: #00ff88; text-shadow: 0 0 10px #00ff88; }
-        .nivel { color: #ffff00; text-shadow: 0 0 10px #ffff00; }
-        .vida { color: #ff4466; text-shadow: 0 0 10px #ff4466; }
-
-        /* Canvas del juego */
-        #gameCanvas {
-            flex-grow: 1;
-            display: block;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-        }
-
-        /* Controles Inferiores — Neon 3D */
+        /* Controles */
         #controls {
             display: flex;
             justify-content: space-between;
-            padding: 12px 15px 18px 15px;
-            background: linear-gradient(0deg, rgba(0,15,30,0.98), rgba(0,10,25,0.95));
+            padding: 15px;
+            gap: 10px;
+            background: rgba(0,15,30,0.95);
             border-top: 2px solid #ff00ff;
-            gap: 12px;
-            z-index: 10;
-            flex-shrink: 0;
-            box-shadow: 0 -5px 20px rgba(255,0,255,0.2);
         }
-
         .control-btn {
             flex: 1;
-            background: linear-gradient(135deg, rgba(0,255,255,0.2), rgba(0,150,255,0.15));
-            border: 2px solid #00ffff;
-            color: #00ffff;
-            padding: 16px 0;
-            font-size: clamp(1.3rem, 5vw, 1.6rem);
-            font-family: inherit;
+            padding: 18px 0;
+            font-size: 24px;
             font-weight: bold;
-            border-radius: 14px;
+            border-radius: 12px;
+            border: 2px solid #00ffff;
+            background: rgba(0,255,255,0.15);
+            color: #00ffff;
             cursor: pointer;
-            box-shadow: 
-                0 0 15px rgba(0,255,255,0.4),
-                inset 0 0 10px rgba(0,255,255,0.15);
-            outline: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 65px;
+            box-shadow: 0 0 15px rgba(0,255,255,0.3);
             -webkit-tap-highlight-color: transparent;
-            transition: all 0.15s;
         }
-
         #fireBtn {
-            background: linear-gradient(135deg, rgba(255,0,100,0.25), rgba(255,0,150,0.15));
             border-color: #ff0088;
+            background: rgba(255,0,100,0.15);
             color: #ff0088;
-            box-shadow: 
-                0 0 15px rgba(255,0,100,0.4),
-                inset 0 0 10px rgba(255,0,100,0.15);
-            font-size: clamp(0.95rem, 3.5vw, 1.15rem);
+            box-shadow: 0 0 15px rgba(255,0,100,0.3);
+            font-size: 18px;
         }
+        .control-btn:active { transform: scale(0.95); }
 
-        .control-btn:active {
-            transform: scale(0.93) translateY(2px);
-            box-shadow: inset 0 0 20px currentColor;
-        }
-
-        #fireBtn:active {
-            background: #ff0088;
-            color: #fff;
+        /* Aviso de nivel */
+        #level-announce {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            color: #ffff00;
+            text-shadow: 0 0 20px #ffff00;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-
     <div id="game-container">
-        <!-- PANTALLA DE INICIO -->
-        <div id="start-screen">
-            <div class="titulo">🚀 ESPACIO 3D NEON</div>
-            <div class="subtitulo">Destruye enemigos • Sube de nivel cada 50 puntos</div>
-            <div class="record">🏆 Récord: <span id="highscore-start">0</span></div>
-            <button class="boton-inicio" id="startBtn">▶ EMPEZAR</button>
+        <div id="hud">
+            <span class="puntos">🎯 <span id="score">0</span></span>
+            <span class="nivel">📈 NIVEL <span id="level">1</span></span>
+            <span class="vida">🛡️ <span id="lives">3</span></span>
         </div>
-
-        <!-- PANTALLA DE FIN DE JUEGO -->
-        <div id="gameover-screen">
-            <div class="titulo">💥 FIN DEL JUEGO</div>
-            <div class="subtitulo">Puntuación: <span id="final-score">0</span></div>
-            <div class="record">🏆 Récord: <span id="highscore-end">0</span></div>
-            <button class="boton-inicio" id="restartBtn">🔄 REINICIAR</button>
-        </div>
-
-        <!-- AVISO DE NIVEL -->
-        <div class="aviso-nivel" id="level-announce">NIVEL 1</div>
-
-        <!-- HUD / Marcadores -->
-        <div id="hud" style="display: none;">
-            <div class="hud-item puntos">🎯 <span id="score">0</span></div>
-            <div class="hud-item nivel">📈 NIVEL <span id="level">1</span></div>
-            <div class="hud-item vida">🛡️ <span id="lives">3</span></div>
-        </div>
-
-        <!-- Canvas -->
+        <div id="level-announce">NIVEL 1</div>
         <canvas id="gameCanvas"></canvas>
-
-        <!-- Controles -->
-        <div id="controls" style="display: none;">
+        <div id="controls">
             <button class="control-btn" id="leftBtn">◀</button>
             <button class="control-btn" id="fireBtn">⚡ FUEGO</button>
             <button class="control-btn" id="rightBtn">▶</button>
@@ -283,426 +106,205 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        // ELEMENTOS DE PANTALLA
-        const startScreen = document.getElementById("start-screen");
-        const gameoverScreen = document.getElementById("gameover-screen");
-        const hud = document.getElementById("hud");
-        const controls = document.getElementById("controls");
-        const levelAnnounce = document.getElementById("level-announce");
-        const startBtn = document.getElementById("startBtn");
-        const restartBtn = document.getElementById("restartBtn");
-
-        // RÉCORD PERMANENTE
-        let highScore = parseInt(localStorage.getItem("spaceGameHighScore")) || 0;
-        document.getElementById("highscore-start").textContent = highScore;
-
+        // Ajustar tamaño del canvas
         function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width * window.devicePixelRatio;
-            canvas.height = rect.height * window.devicePixelRatio;
-            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
         }
         window.addEventListener('resize', resizeCanvas);
-        window.addEventListener('orientationchange', () => setTimeout(resizeCanvas, 100));
         resizeCanvas();
 
-        // --- SISTEMA DE AUDIO ---
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
-            if (type === 'laser') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(150, now + 0.12);
-                gain.gain.setValueAtTime(0.18, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
-                osc.start(now); osc.stop(now + 0.12);
-            } else if (type === 'explosion') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(150, now);
-                osc.frequency.linearRampToValueAtTime(40, now + 0.3);
-                gain.gain.setValueAtTime(0.25, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now); osc.stop(now + 0.3);
-            } else if (type === 'levelup') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, now);
-                osc.frequency.exponentialRampToValueAtTime(1000, now + 0.5);
-                gain.gain.setValueAtTime(0.35, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.5);
-                osc.start(now); osc.stop(now + 0.5);
-            } else if (type === 'hit') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(250, now);
-                osc.frequency.exponentialRampToValueAtTime(60, now + 0.35);
-                gain.gain.setValueAtTime(0.35, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
-                osc.start(now); osc.stop(now + 0.35);
-            }
-        }
-
-        // VARIABLES DEL JUEGO
+        // Variables del juego
         let score = 0, lives = 3, level = 1;
-        let enemySpeed = 2.0, spawnInterval = 1800;
-        let gameRunning = false;
+        let enemySpeed = 2, spawnInterval = 1800;
+        let movingLeft = false, movingRight = false;
+        let bullets = [], enemies = [], explosions = [], stars = [];
+        let player = { x: 0, y: 0, w: 50, h: 50, speed: 6 };
+        let gameRunning = true;
 
-        // ESTRELLAS 3D CON PROFUNDIDAD
-        let stars = [];
-        for (let i = 0; i < 120; i++) {
+        // Generar estrellas
+        for (let i = 0; i < 100; i++) {
             stars.push({
-                x: Math.random() * 600,
+                x: Math.random() * 500,
                 y: Math.random() * 1000,
-                z: Math.random() * 3 + 1, // PROFUNDIDAD 3D
-                size: Math.random() * 2.5 + 0.5,
-                speed: Math.random() * 2 + 0.3
+                size: Math.random() * 2 + 0.5,
+                speed: Math.random() * 1.5 + 0.5
             });
         }
 
-        let player = { x: 0, y: 0, width: 50, height: 50, speed: 6 };
-        let bullets = [], enemies = [], explosions = [];
-        let movingLeft = false, movingRight = false;
-        let enemyTimer = null;
-
-        // CONTROLES TÁCTILES Y MOUSE
+        // CONTROLES TÁCTILES
         const leftBtn = document.getElementById("leftBtn");
         const rightBtn = document.getElementById("rightBtn");
         const fireBtn = document.getElementById("fireBtn");
 
+        leftBtn.addEventListener("touchstart", e => {e.preventDefault(); movingLeft = true;});
+        leftBtn.addEventListener("touchend", () => movingLeft = false);
         leftBtn.addEventListener("mousedown", () => movingLeft = true);
         leftBtn.addEventListener("mouseup", () => movingLeft = false);
-        leftBtn.addEventListener("touchstart", (e) => { e.preventDefault(); movingLeft = true; });
-        leftBtn.addEventListener("touchend", (e) => { e.preventDefault(); movingLeft = false; });
 
+        rightBtn.addEventListener("touchstart", e => {e.preventDefault(); movingRight = true;});
+        rightBtn.addEventListener("touchend", () => movingRight = false);
         rightBtn.addEventListener("mousedown", () => movingRight = true);
         rightBtn.addEventListener("mouseup", () => movingRight = false);
-        rightBtn.addEventListener("touchstart", (e) => { e.preventDefault(); movingRight = true; });
-        rightBtn.addEventListener("touchend", (e) => { e.preventDefault(); movingRight = false; });
 
         function disparar() {
-            if (!gameRunning) return;
-            bullets.push({ 
-                x: player.x + player.width / 2 - 4, 
-                y: player.y, 
-                width: 8, 
-                height: 18, 
-                speed: 11 
-            });
-            playSound('laser');
+            bullets.push({x: player.x + 21, y: player.y, w: 8, h: 18, speed: 10});
         }
+        fireBtn.addEventListener("touchstart", e => {e.preventDefault(); disparar();});
         fireBtn.addEventListener("click", disparar);
-        fireBtn.addEventListener("touchstart", (e) => { e.preventDefault(); disparar(); });
 
-        // CONTROLES DE TECLADO
-        window.addEventListener("keydown", (e) => {
-            if (!gameRunning) return;
-            if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") movingLeft = true;
-            if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") movingRight = true;
-            if (e.key === " " || e.key === "ArrowUp") { if (!e.repeat) disparar(); }
+        // CONTROLES TECLADO
+        window.addEventListener("keydown", e => {
+            if (e.key === "ArrowLeft" || e.key === "a") movingLeft = true;
+            if (e.key === "ArrowRight" || e.key === "d") movingRight = true;
+            if (e.key === " ") disparar();
         });
-        window.addEventListener("keyup", (e) => {
-            if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") movingLeft = false;
-            if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") movingRight = false;
+        window.addEventListener("keyup", e => {
+            if (e.key === "ArrowLeft" || e.key === "a") movingLeft = false;
+            if (e.key === "ArrowRight" || e.key === "d") movingRight = false;
         });
 
-        // GENERAR ENEMIGOS POR TIPO
-        function spawnEnemy() {
-            const rand = Math.random();
-            let type = 'normal';
-            if (level >= 3 && rand < 0.25) type = 'fast';
-            if (level >= 5 && rand < 0.15) type = 'big';
-
-            let enemy = {
+        // Crear enemigo
+        function crearEnemigo() {
+            enemies.push({
                 x: Math.random() * (canvas.width - 50),
-                y: -60,
-                width: 45,
-                height: 45,
+                y: -50,
+                w: 45, h: 45,
                 speed: enemySpeed,
-                type: type,
-                hp: 1,
-                rotation: 0 // EFECTO DE ROTACIÓN 3D
-            };
-
-            if (type === 'fast') { enemy.speed *= 1.6; enemy.width = 38; enemy.height = 38; }
-            if (type === 'big') { enemy.width = 60; enemy.height = 60; enemy.hp = 2; enemy.speed *= 0.85; }
-
-            enemies.push(enemy);
+                tipo: Math.random() > 0.7 ? "rapido" : "normal"
+            });
         }
 
-        function resetEnemySpawner() {
-            if (enemyTimer) clearInterval(enemyTimer);
-            enemyTimer = setInterval(spawnEnemy, spawnInterval);
-        }
+        // Generar enemigos cada cierto tiempo
+        setInterval(crearEnemigo, spawnInterval);
 
-        // EXPLOSIONES 3D CON PARTÍCULAS
-        function createExplosion(x, y) {
-            for (let i = 0; i < 20; i++) {
-                explosions.push({
-                    x: x, y: y,
-                    vx: (Math.random() - 0.5) * 10,
-                    vy: (Math.random() - 0.5) * 10,
-                    size: Math.random() * 8 + 3,
-                    life: 1,
-                    color: ['#ff0088', '#ffff00', '#ff8800', '#00ffff'][Math.floor(Math.random() * 4)],
-                    glow: Math.random() * 15 + 5
-                });
-            }
-        }
-
-        // SUBIR DE NIVEL CADA 50 PUNTOS
-        function checkLevelUp() {
-            const newLevel = Math.floor(score / 50) + 1;
-            if (newLevel > level) {
-                level = newLevel;
+        // Subir de nivel
+        function subirNivel() {
+            const nuevoNivel = Math.floor(score / 50) + 1;
+            if (nuevoNivel > level) {
+                level = nuevoNivel;
                 document.getElementById("level").textContent = level;
-                enemySpeed += 0.55;
-                spawnInterval = Math.max(450, spawnInterval - 150);
-                resetEnemySpawner();
-                playSound('levelup');
-
-                // MOSTRAR AVISO DE NIVEL
-                levelAnnounce.textContent = `NIVEL ${level} ⚡`;
-                levelAnnounce.style.opacity = '1';
-                setTimeout(() => { levelAnnounce.style.opacity = '0'; }, 1800);
+                enemySpeed += 0.5;
+                spawnInterval = Math.max(500, spawnInterval - 150);
+                const aviso = document.getElementById("level-announce");
+                aviso.textContent = `NIVEL ${level} ⚡`;
+                aviso.style.opacity = "1";
+                setTimeout(() => aviso.style.opacity = "0", 1500);
             }
         }
 
-        // FIN DE JUEGO
+        // Game Over
         function gameOver() {
-            gameRunning = false;
-            if (enemyTimer) clearInterval(enemyTimer);
-            
-            if (score > highScore) {
-                highScore = score;
-                localStorage.setItem("spaceGameHighScore", highScore);
-            }
-
-            document.getElementById("final-score").textContent = score;
-            document.getElementById("highscore-end").textContent = highScore;
-            document.getElementById("highscore-start").textContent = highScore;
-
-            hud.style.display = 'none';
-            controls.style.display = 'none';
-            gameoverScreen.style.display = 'flex';
-        }
-
-        // INICIAR JUEGO
-        function startGame() {
+            alert(`¡JUEGO TERMINADO!\nPuntos: ${score}\nNivel alcanzado: ${level}`);
             score = 0; lives = 3; level = 1;
-            enemySpeed = 2.0; spawnInterval = 1800;
+            enemySpeed = 2; spawnInterval = 1800;
             bullets = []; enemies = []; explosions = [];
-            movingLeft = false; movingRight = false;
-            gameRunning = true;
-
-            player.x = canvas.width / 2 - 25;
-            player.y = canvas.height - 80;
-
             document.getElementById("score").textContent = score;
             document.getElementById("lives").textContent = lives;
             document.getElementById("level").textContent = level;
-
-            startScreen.style.display = 'none';
-            gameoverScreen.style.display = 'none';
-            hud.style.display = 'flex';
-            controls.style.display = 'flex';
-
-            resetEnemySpawner();
         }
 
-        startBtn.addEventListener("click", startGame);
-        restartBtn.addEventListener("click", startGame);
-
-        // DIBUJAR NAVE 3D NEÓN
-        function drawPlayer() {
-            const px = player.x, py = player.y, pw = player.width, ph = player.height;
-            
-            // EFECTO DE PROPULSOR
-            const gradient = ctx.createLinearGradient(px, py + ph, px, py);
-            gradient.addColorStop(0, 'rgba(255, 0, 255, 0.8)');
-            gradient.addColorStop(0.3, 'rgba(0, 255, 255, 0.5)');
-            gradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
-            
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.moveTo(px + pw/2, py);
-            ctx.lineTo(px + pw, py + ph);
-            ctx.lineTo(px + pw * 0.7, py + ph * 0.7);
-            ctx.lineTo(px + pw * 0.3, py + ph * 0.7);
-            ctx.lineTo(px, py + ph);
-            ctx.closePath();
-            ctx.fill();
-
-            // BORDE NEÓN
-            ctx.strokeStyle = '#00ffff';
-            ctx.lineWidth = 2;
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = '#00ffff';
-            ctx.stroke();
-
-            // CENTRO BRILLANTE
-            ctx.fillStyle = '#fff';
-            ctx.beginPath();
-            ctx.arc(px + pw/2, py + ph * 0.4, 5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-        }
-
-        // DIBUJAR ENEMIGO 3D
-        function drawEnemy(e) {
-            ctx.save();
-            ctx.translate(e.x + e.width/2, e.y + e.height/2);
-            e.rotation += 0.02;
-            ctx.rotate(e.rotation);
-
-            let color1, color2, glow;
-            if (e.type === 'normal') {
-                color1 = '#ff0088'; color2 = '#ff44aa'; glow = '#ff0088';
-            } else if (e.type === 'fast') {
-                color1 = '#ffcc00'; color2 = '#ff8800'; glow = '#ffcc00';
-            } else {
-                color1 = '#ff2200'; color2 = '#ff6600'; glow = '#ff2200';
-            }
-
-            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, e.width/2);
-            gradient.addColorStop(0, color2);
-            gradient.addColorStop(1, color1);
-
-            ctx.fillStyle = gradient;
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = glow;
-
-            // FORMA DE OVNI 3D
-            ctx.beginPath();
-            ctx.ellipse(0, 0, e.width/2, e.height/3, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Cúpula
-            ctx.fillStyle = 'rgba(255,255,255,0.3)';
-            ctx.beginPath();
-            ctx.ellipse(0, -e.height/6, e.width/4, e.height/5, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.restore();
-        }
-
-        // BUCLE PRINCIPAL
+        // Bucle principal
         function update() {
             if (!gameRunning) return;
 
-            // ESTRELLAS 3D CON PROFUNDIDAD
+            // Estrellas
             stars.forEach(s => {
-                s.y += s.speed * s.z;
-                if (s.y > canvas.height) { 
-                    s.y = 0; 
-                    s.x = Math.random() * canvas.width; 
-                }
+                s.y += s.speed;
+                if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
             });
 
-            // MOVIMIENTO NAVE
-            player.x = Math.max(0, Math.min(canvas.width - player.width, player.x + (movingRight ? player.speed : 0) - (movingLeft ? player.speed : 0)));
+            // Mover nave
+            if (movingLeft) player.x -= player.speed;
+            if (movingRight) player.x += player.speed;
+            player.x = Math.max(0, Math.min(canvas.width - player.w, player.x));
+            player.y = canvas.height - 80;
 
-            // BALAS
+            // Mover balas
             bullets.forEach((b, i) => {
                 b.y -= b.speed;
                 if (b.y < 0) bullets.splice(i, 1);
             });
 
-            // ENEMIGOS
-            enemies.forEach((e, eIndex) => {
+            // Mover enemigos y colisiones
+            enemies.forEach((e, ei) => {
                 e.y += e.speed;
                 if (e.y > canvas.height) {
-                    enemies.splice(eIndex, 1);
+                    enemies.splice(ei, 1);
                     lives--;
                     document.getElementById("lives").textContent = lives;
-                    playSound('hit');
-                    if (lives <= 0) { gameOver(); return; }
+                    if (lives <= 0) return gameOver();
                 }
 
-                // COLISIÓN BALA - ENEMIGO
-                bullets.forEach((b, bIndex) => {
-                    if (b.x < e.x + e.width && b.x + b.width > e.x && b.y < e.y + e.height && b.y + b.height > e.y) {
-                        bullets.splice(bIndex, 1);
-                        e.hp--;
-                        if (e.hp <= 0) {
-                            createExplosion(e.x + e.width / 2, e.y + e.height / 2);
-                            enemies.splice(eIndex, 1);
-                            score++;
-                            document.getElementById("score").textContent = score;
-                            playSound('explosion');
-                            checkLevelUp();
-                        }
+                // Colisión bala-enemigo
+                bullets.forEach((b, bi) => {
+                    if (b.x < e.x + e.w && b.x + b.w > e.x && b.y < e.y + e.h && b.y + b.h > e.y) {
+                        bullets.splice(bi, 1);
+                        enemies.splice(ei, 1);
+                        score++;
+                        document.getElementById("score").textContent = score;
+                        subirNivel();
                     }
                 });
             });
-
-            // EXPLOSIONES
-            explosions.forEach((exp, i) => {
-                exp.x += exp.vx;
-                exp.y += exp.vy;
-                exp.life -= 0.025;
-                exp.vy += 0.1; // GRAVEDAD
-                if (exp.life <= 0) explosions.splice(i, 1);
-            });
         }
 
+        // Dibujar todo
         function draw() {
-            // FONDO OSCURO
-            ctx.fillStyle = '#000510';
+            // Fondo
+            ctx.fillStyle = "#000510";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // ESTRELLAS 3D
+            // Estrellas
+            ctx.fillStyle = "#fff";
             stars.forEach(s => {
-                ctx.fillStyle = `rgba(255,255,255, ${0.3 + s.z * 0.25})`;
+                ctx.globalAlpha = 0.5 + Math.random() * 0.5;
                 ctx.beginPath();
-                ctx.arc(s.x, s.y, s.size * s.z * 0.6, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            if (!gameRunning) return;
-
-            // DIBUJAR NAVE
-            drawPlayer();
-
-            // BALAS DE PLASMA NEÓN
-            bullets.forEach(b => {
-                const grad = ctx.createLinearGradient(b.x, b.y, b.x, b.y + b.height);
-                grad.addColorStop(0, '#fff');
-                grad.addColorStop(0.5, '#00ffff');
-                grad.addColorStop(1, '#0088ff');
-                ctx.fillStyle = grad;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#00ffff';
-                ctx.fillRect(b.x, b.y, b.width, b.height);
-            });
-            ctx.shadowBlur = 0;
-
-            // ENEMIGOS 3D
-            enemies.forEach(e => drawEnemy(e));
-
-            // EXPLOSIONES CON BRILLO
-            explosions.forEach(exp => {
-                ctx.globalAlpha = exp.life;
-                ctx.fillStyle = exp.color;
-                ctx.shadowBlur = exp.glow;
-                ctx.shadowColor = exp.color;
-                ctx.beginPath();
-                ctx.arc(exp.x, exp.y, exp.size * exp.life, 0, Math.PI * 2);
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
                 ctx.fill();
             });
             ctx.globalAlpha = 1;
+
+            // Nave del jugador 🚀
+            ctx.fillStyle = "#00ffff";
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#00ffff";
+            ctx.beginPath();
+            ctx.moveTo(player.x + player.w/2, player.y);
+            ctx.lineTo(player.x + player.w, player.y + player.h);
+            ctx.lineTo(player.x + player.w * 0.3, player.y + player.h * 0.7);
+            ctx.lineTo(player.x + player.w * 0.7, player.y + player.h * 0.7);
+            ctx.lineTo(player.x, player.y + player.h);
+            ctx.closePath();
+            ctx.fill();
             ctx.shadowBlur = 0;
+
+            // Balas ⚡
+            ctx.fillStyle = "#00ffff";
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "#00ffff";
+            bullets.forEach(b => ctx.fillRect(b.x, b.y, b.w, b.h));
+            ctx.shadowBlur = 0;
+
+            // Enemigos 🛸
+            enemies.forEach(e => {
+                ctx.fillStyle = e.tipo === "rapido" ? "#ffcc00" : "#ff0088";
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = e.tipo === "rapido" ? "#ffcc00" : "#ff0088";
+                ctx.beginPath();
+                ctx.ellipse(e.x + e.w/2, e.y + e.h/2, e.w/2, e.h/3, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            });
         }
 
-        function gameLoop() {
+        // Bucle del juego
+        function loop() {
             update();
             draw();
-            requestAnimationFrame(gameLoop);
+            requestAnimationFrame(loop);
         }
-
-        gameLoop();
+        loop();
     </script>
 </body>
 </html>
