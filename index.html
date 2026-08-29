@@ -2,18 +2,37 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🚀 Juego Espacial 3D — Listo para jugar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-fullscreen" content="yes">
+    <title>🚀 Juego Espacial 3D — Pantalla Completa</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; touch-action: manipulation; }
-        body { background: #000; color: #00ffff; font-family: Arial, sans-serif; height: 100vh; width: 100vw; overflow: hidden; }
         
+        html, body {
+            background: #000;
+            color: #00ffff;
+            font-family: Arial, sans-serif;
+            height: 100%;
+            height: 100dvh; /* ✅ Ocupa TODA la pantalla incluyendo zonas seguras */
+            width: 100%;
+            overflow: hidden;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* ✅ Oculta barras de navegación en celular */
+            -webkit-overflow-scrolling: touch;
+        }
+
         #game-container {
             position: relative;
             width: 100%;
             height: 100%;
-            max-width: 500px;
-            max-height: 900px;
+            max-width: 520px;
+            max-height: 95dvh;
             margin: 0 auto;
             background: radial-gradient(ellipse at center, #0f1628 0%, #000510 60%, #000 100%);
             display: flex;
@@ -21,6 +40,9 @@
             border: 3px solid;
             border-image: linear-gradient(135deg, #00ffff, #ff00ff, #00ffff) 1;
             box-shadow: 0 0 30px rgba(0,255,255,0.3);
+            /* ✅ Espacio para no cortar nada */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         /* HUD */
@@ -33,26 +55,29 @@
             font-size: 16px;
             font-weight: bold;
             text-shadow: 0 0 10px currentColor;
+            flex-shrink: 0;
         }
         .puntos { color: #00ff88; }
         .nivel { color: #ffff00; }
         .vida { color: #ff4466; }
 
         /* Canvas */
-        #gameCanvas { flex: 1; display: block; width: 100%; }
+        #gameCanvas { flex: 1; display: block; width: 100%; height: 100%; }
 
-        /* Controles */
+        /* Controles — más arriba para que no queden debajo de los botones del sistema */
         #controls {
             display: flex;
             justify-content: space-between;
-            padding: 15px;
+            padding: 12px 15px 20px 15px;
             gap: 10px;
             background: rgba(0,15,30,0.95);
             border-top: 2px solid #ff00ff;
+            flex-shrink: 0;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* ✅ Evita que queden pegados al borde */
         }
         .control-btn {
             flex: 1;
-            padding: 18px 0;
+            padding: 16px 0;
             font-size: 24px;
             font-weight: bold;
             border-radius: 12px;
@@ -62,6 +87,7 @@
             cursor: pointer;
             box-shadow: 0 0 15px rgba(0,255,255,0.3);
             -webkit-tap-highlight-color: transparent;
+            min-height: 60px;
         }
         #fireBtn {
             border-color: #ff0088;
@@ -84,17 +110,37 @@
             opacity: 0;
             pointer-events: none;
         }
+
+        /* ✅ Botón para entrar a pantalla completa */
+        #fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 20;
+            background: rgba(0,255,255,0.2);
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        #fullscreen-btn.hidden { display: none; }
     </style>
 </head>
 <body>
     <div id="game-container">
+        <button id="fullscreen-btn">⛶ PANTALLA COMPLETA</button>
+        
         <div id="hud">
             <span class="puntos">🎯 <span id="score">0</span></span>
             <span class="nivel">📈 NIVEL <span id="level">1</span></span>
             <span class="vida">🛡️ <span id="lives">3</span></span>
         </div>
+        
         <div id="level-announce">NIVEL 1</div>
         <canvas id="gameCanvas"></canvas>
+        
         <div id="controls">
             <button class="control-btn" id="leftBtn">◀</button>
             <button class="control-btn" id="fireBtn">⚡ FUEGO</button>
@@ -105,6 +151,22 @@
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
+        const fullscreenBtn = document.getElementById("fullscreen-btn");
+
+        // ✅ FUNCIÓN PARA PANTALLA COMPLETA — OCULTA BOTONES DEL CELULAR
+        function entrarPantallaCompleta() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) elem.requestFullscreen();
+            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+            else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+            
+            // Ocultar barras en móvil
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+                fullscreenBtn.classList.add('hidden');
+            }, 300);
+        }
+        fullscreenBtn.addEventListener("click", entrarPantallaCompleta);
 
         // Ajustar tamaño del canvas
         function resizeCanvas() {
@@ -118,7 +180,7 @@
         let score = 0, lives = 3, level = 1;
         let enemySpeed = 2, spawnInterval = 1800;
         let movingLeft = false, movingRight = false;
-        let bullets = [], enemies = [], explosions = [], stars = [];
+        let bullets = [], enemies = [], stars = [];
         let player = { x: 0, y: 0, w: 50, h: 50, speed: 6 };
         let gameRunning = true;
 
@@ -198,7 +260,7 @@
             alert(`¡JUEGO TERMINADO!\nPuntos: ${score}\nNivel alcanzado: ${level}`);
             score = 0; lives = 3; level = 1;
             enemySpeed = 2; spawnInterval = 1800;
-            bullets = []; enemies = []; explosions = [];
+            bullets = []; enemies = [];
             document.getElementById("score").textContent = score;
             document.getElementById("lives").textContent = lives;
             document.getElementById("level").textContent = level;
