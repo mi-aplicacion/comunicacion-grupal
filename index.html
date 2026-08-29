@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juego Espacial</title>
+    <title>Juego Espacial — Versión Actualizada</title>
     <style>
         * {
             box-sizing: border-box;
@@ -47,6 +47,69 @@
             }
         }
 
+        /* PANTALLA DE INICIO Y FIN */
+        #start-screen, #gameover-screen {
+            position: absolute;
+            inset: 0;
+            background: rgba(5, 7, 11, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        #gameover-screen { display: none; }
+
+        .titulo {
+            font-size: 1.8rem;
+            color: #00ffcc;
+            text-shadow: 0 0 20px #00ffcc;
+            text-align: center;
+        }
+
+        .subtitulo {
+            font-size: 1rem;
+            color: #ff0055;
+        }
+
+        .record {
+            font-size: 1.1rem;
+            color: #ffcc00;
+            margin-top: 10px;
+        }
+
+        .boton-inicio {
+            background: linear-gradient(135deg, #00ffcc, #009977);
+            border: none;
+            color: #05070b;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+        }
+
+        .boton-inicio:hover { transform: scale(1.05); }
+
+        .aviso-nivel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            color: #ffcc00;
+            text-shadow: 0 0 30px #ffcc00;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
         /* HUD Superior */
         #hud {
             display: flex;
@@ -77,7 +140,7 @@
             height: 100%;
         }
 
-        /* Controles Inferiores Completamente Visibles */
+        /* Controles Inferiores */
         #controls {
             display: flex;
             justify-content: space-between;
@@ -130,9 +193,29 @@
 <body>
 
     <div id="game-container">
+        <!-- PANTALLA DE INICIO -->
+        <div id="start-screen">
+            <div class="titulo">🚀 JUEGO ESPACIAL</div>
+            <div class="subtitulo">Destruye los enemigos y sube de nivel</div>
+            <div class="record">🏆 Récord: <span id="highscore-start">0</span></div>
+            <button class="boton-inicio" id="startBtn">▶ EMPEZAR</button>
+        </div>
+
+        <!-- PANTALLA DE FIN DE JUEGO -->
+        <div id="gameover-screen">
+            <div class="titulo">💥 FIN DEL JUEGO</div>
+            <div class="subtitulo">Puntuación: <span id="final-score">0</span></div>
+            <div class="record">🏆 Récord: <span id="highscore-end">0</span></div>
+            <button class="boton-inicio" id="restartBtn">🔄 REINICIAR</button>
+        </div>
+
+        <!-- AVISO DE NIVEL -->
+        <div class="aviso-nivel" id="level-announce">NIVEL 1</div>
+
         <!-- HUD / Marcadores -->
-        <div id="hud">
-            <div class="hud-item">🎯 BAJAS: <span id="score">0</span></div>
+        <div id="hud" style="display: none;">
+            <div class="hud-item">🎯 PUNTOS: <span id="score">0</span></div>
+            <div class="hud-item">📈 NIVEL: <span id="level">1</span></div>
             <div class="hud-item">🛡️ VIDA: <span id="lives">3</span></div>
         </div>
 
@@ -140,7 +223,7 @@
         <canvas id="gameCanvas"></canvas>
 
         <!-- Controles -->
-        <div id="controls">
+        <div id="controls" style="display: none;">
             <button class="control-btn" id="leftBtn">◀</button>
             <button class="control-btn" id="fireBtn">⚡ FUEGO</button>
             <button class="control-btn" id="rightBtn">▶</button>
@@ -151,85 +234,88 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
+        // ELEMENTOS DE PANTALLA
+        const startScreen = document.getElementById("start-screen");
+        const gameoverScreen = document.getElementById("gameover-screen");
+        const hud = document.getElementById("hud");
+        const controls = document.getElementById("controls");
+        const levelAnnounce = document.getElementById("level-announce");
+        const startBtn = document.getElementById("startBtn");
+        const restartBtn = document.getElementById("restartBtn");
+
+        // SISTEMA DE RÉCORD GUARDADO
+        let highScore = parseInt(localStorage.getItem("spaceGameHighScore")) || 0;
+        document.getElementById("highscore-start").textContent = highScore;
+
         function resizeCanvas() {
             canvas.width = canvas.clientWidth;
             canvas.height = canvas.clientHeight;
         }
-
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // --- SISTEMA DE AUDIO (Web Audio API) ---
+        // --- SISTEMA DE AUDIO ---
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
         function playSound(type) {
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
+            osc.connect(gain); gain.connect(audioCtx.destination);
             const now = audioCtx.currentTime;
-
             if (type === 'laser') {
                 osc.type = 'sawtooth';
                 osc.frequency.setValueAtTime(600, now);
                 osc.frequency.exponentialRampToValueAtTime(100, now + 0.15);
                 gain.gain.setValueAtTime(0.15, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
-                osc.start(now);
-                osc.stop(now + 0.15);
+                osc.start(now); osc.stop(now + 0.15);
             } else if (type === 'explosion') {
                 osc.type = 'square';
                 osc.frequency.setValueAtTime(120, now);
                 osc.frequency.linearRampToValueAtTime(30, now + 0.25);
                 gain.gain.setValueAtTime(0.2, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-                osc.start(now);
-                osc.stop(now + 0.25);
+                osc.start(now); osc.stop(now + 0.25);
+            } else if (type === 'levelup') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(900, now + 0.4);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now); osc.stop(now + 0.4);
             } else if (type === 'hit') {
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(200, now);
                 osc.frequency.exponentialRampToValueAtTime(50, now + 0.3);
                 gain.gain.setValueAtTime(0.3, now);
                 gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
-            } else if (type === 'levelup') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(300, now);
-                osc.frequency.exponentialRampToValueAtTime(800, now + 0.3);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now);
-                osc.stop(now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
             }
         }
 
-        // Variables del juego
-        let score = 0;
-        let lives = 3;
-        let enemySpeed = 2.0;
-        let spawnInterval = 1900;
+        // VARIABLES DEL JUEGO
+        let score = 0, lives = 3, level = 1;
+        let enemySpeed = 2.0, spawnInterval = 1800;
         let lastLevelMilestone = 0;
+        let gameRunning = false;
 
-        let player = {
-            x: canvas.width / 2 - 25,
-            y: canvas.height - 70,
-            width: 45,
-            height: 45,
-            speed: 6
-        };
+        // ESTRELLAS DE FONDO
+        let stars = [];
+        for (let i = 0; i < 80; i++) {
+            stars.push({
+                x: Math.random() * 500,
+                y: Math.random() * 900,
+                size: Math.random() * 2 + 0.5,
+                speed: Math.random() * 1.5 + 0.5
+            });
+        }
 
-        let bullets = [];
-        let enemies = [];
+        let player = { x: 0, y: 0, width: 45, height: 45, speed: 6 };
+        let bullets = [], enemies = [], explosions = [];
+        let movingLeft = false, movingRight = false;
+        let enemyTimer = null;
 
-        let movingLeft = false;
-        let movingRight = false;
-
-        // Controles inferiores
+        // CONTROLES
         const leftBtn = document.getElementById("leftBtn");
         const rightBtn = document.getElementById("rightBtn");
         const fireBtn = document.getElementById("fireBtn");
@@ -245,109 +331,235 @@
         rightBtn.addEventListener("touchend", () => movingRight = false);
 
         function disparar() {
+            if (!gameRunning) return;
             bullets.push({ x: player.x + player.width / 2 - 3, y: player.y, width: 6, height: 14, speed: 9 });
             playSound('laser');
         }
-
         fireBtn.addEventListener("click", disparar);
         fireBtn.addEventListener("touchstart", (e) => { e.preventDefault(); disparar(); });
 
-        // Teclado PC
         window.addEventListener("keydown", (e) => {
+            if (!gameRunning) return;
             if (e.key === "ArrowLeft" || e.key === "a") movingLeft = true;
             if (e.key === "ArrowRight" || e.key === "d") movingRight = true;
-            if (e.key === " " || e.key === "ArrowUp") {
-                if (!e.repeat) disparar();
-            }
+            if (e.key === " " || e.key === "ArrowUp") { if (!e.repeat) disparar(); }
         });
         window.addEventListener("keyup", (e) => {
             if (e.key === "ArrowLeft" || e.key === "a") movingLeft = false;
             if (e.key === "ArrowRight" || e.key === "d") movingRight = false;
         });
 
-        let enemyTimer = null;
+        // GENERAR ENEMIGOS POR TIPO
+        function spawnEnemy() {
+            const rand = Math.random();
+            let type = 'normal';
+            if (level >= 3 && rand < 0.25) type = 'fast';
+            if (level >= 5 && rand < 0.15) type = 'big';
+
+            let enemy = {
+                x: Math.random() * (canvas.width - 45),
+                y: -50,
+                width: 42,
+                height: 42,
+                speed: enemySpeed,
+                type: type,
+                hp: 1
+            };
+
+            if (type === 'fast') { enemy.speed *= 1.5; enemy.width = 35; enemy.height = 35; }
+            if (type === 'big') { enemy.width = 55; enemy.height = 55; enemy.hp = 2; enemy.speed *= 0.8; }
+
+            enemies.push(enemy);
+        }
 
         function resetEnemySpawner() {
             if (enemyTimer) clearInterval(enemyTimer);
-            enemyTimer = setInterval(() => {
-                enemies.push({
-                    x: Math.random() * (canvas.width - 45),
-                    y: -50,
-                    width: 42,
-                    height: 42,
-                    speed: enemySpeed
-                });
-            }, spawnInterval);
+            enemyTimer = setInterval(spawnEnemy, spawnInterval);
         }
 
-        resetEnemySpawner();
+        // EXPLOSIONES
+        function createExplosion(x, y) {
+            for (let i = 0; i < 12; i++) {
+                explosions.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    size: Math.random() * 5 + 2,
+                    life: 1,
+                    color: Math.random() > 0.5 ? '#ff0055' : '#ffcc00'
+                });
+            }
+        }
 
+        // SUBIR DE NIVEL CADA 50 PUNTOS
+        function checkLevelUp() {
+            const newLevel = Math.floor(score / 50) + 1;
+            if (newLevel > level) {
+                level = newLevel;
+                document.getElementById("level").textContent = level;
+                enemySpeed += 0.5;
+                spawnInterval = Math.max(500, spawnInterval - 150);
+                resetEnemySpawner();
+                playSound('levelup');
+
+                // MOSTRAR AVISO DE NIVEL
+                levelAnnounce.textContent = `NIVEL ${level} ⚡`;
+                levelAnnounce.style.opacity = '1';
+                setTimeout(() => { levelAnnounce.style.opacity = '0'; }, 1500);
+            }
+        }
+
+        // FIN DE JUEGO
+        function gameOver() {
+            gameRunning = false;
+            if (enemyTimer) clearInterval(enemyTimer);
+            
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem("spaceGameHighScore", highScore);
+            }
+
+            document.getElementById("final-score").textContent = score;
+            document.getElementById("highscore-end").textContent = highScore;
+            document.getElementById("highscore-start").textContent = highScore;
+
+            hud.style.display = 'none';
+            controls.style.display = 'none';
+            gameoverScreen.style.display = 'flex';
+        }
+
+        // INICIAR JUEGO
+        function startGame() {
+            score = 0; lives = 3; level = 1;
+            enemySpeed = 2.0; spawnInterval = 1800;
+            lastLevelMilestone = 0;
+            bullets = []; enemies = []; explosions = [];
+            movingLeft = false; movingRight = false;
+            gameRunning = true;
+
+            player.x = canvas.width / 2 - 22;
+            player.y = canvas.height - 70;
+
+            document.getElementById("score").textContent = score;
+            document.getElementById("lives").textContent = lives;
+            document.getElementById("level").textContent = level;
+
+            startScreen.style.display = 'none';
+            gameoverScreen.style.display = 'none';
+            hud.style.display = 'flex';
+            controls.style.display = 'flex';
+
+            resetEnemySpawner();
+        }
+
+        startBtn.addEventListener("click", startGame);
+        restartBtn.addEventListener("click", startGame);
+
+        // BUCLE PRINCIPAL
         function update() {
-            player.x = Math.max(0, Math.min(canvas.width - player.width, player.x + (movingRight ? player.speed : 0) - (movingLeft ? player.speed : 0)));
+            if (!gameRunning) return;
 
-            bullets.forEach((b, index) => {
-                b.y -= b.speed;
-                if (b.y < 0) bullets.splice(index, 1);
+            // ESTRELLAS
+            stars.forEach(s => {
+                s.y += s.speed;
+                if (s.y > canvas.height) { s.y = 0; s.x = Math.random() * canvas.width; }
             });
 
-            enemies.forEach((e, index) => {
+            // MOVIMIENTO NAVE
+            player.x = Math.max(0, Math.min(canvas.width - player.width, player.x + (movingRight ? player.speed : 0) - (movingLeft ? player.speed : 0)));
+
+            // BALAS
+            bullets.forEach((b, i) => {
+                b.y -= b.speed;
+                if (b.y < 0) bullets.splice(i, 1);
+            });
+
+            // ENEMIGOS
+            enemies.forEach((e, eIndex) => {
                 e.y += e.speed;
                 if (e.y > canvas.height) {
-                    enemies.splice(index, 1);
+                    enemies.splice(eIndex, 1);
                     lives--;
-                    document.getElementById("lives").innerText = lives;
+                    document.getElementById("lives").textContent = lives;
                     playSound('hit');
-                    if (lives <= 0) {
-                        alert("¡Juego terminado! Puntuación final: " + score);
-                        score = 0;
-                        lives = 3;
-                        enemySpeed = 2.0;
-                        spawnInterval = 1900;
-                        lastLevelMilestone = 0;
-                        resetEnemySpawner();
-                        document.getElementById("score").innerText = score;
-                        document.getElementById("lives").innerText = lives;
-                    }
+                    if (lives <= 0) { gameOver(); return; }
                 }
 
+                // COLISIÓN BALA - ENEMIGO
                 bullets.forEach((b, bIndex) => {
                     if (b.x < e.x + e.width && b.x + b.width > e.x && b.y < e.y + e.height && b.y + b.height > e.y) {
-                        enemies.splice(index, 1);
                         bullets.splice(bIndex, 1);
-                        score++;
-                        document.getElementById("score").innerText = score;
-                        playSound('explosion');
-
-                        if (score % 50 === 0 && score !== lastLevelMilestone) {
-                            lastLevelMilestone = score;
-                            enemySpeed += 0.6;
-                            spawnInterval = Math.max(600, spawnInterval - 200);
-                            resetEnemySpawner();
-                            playSound('levelup');
+                        e.hp--;
+                        if (e.hp <= 0) {
+                            createExplosion(e.x + e.width / 2, e.y + e.height / 2);
+                            enemies.splice(eIndex, 1);
+                            score++;
+                            document.getElementById("score").textContent = score;
+                            playSound('explosion');
+                            checkLevelUp();
                         }
                     }
                 });
             });
+
+            // EXPLOSIONES
+            explosions.forEach((exp, i) => {
+                exp.x += exp.vx;
+                exp.y += exp.vy;
+                exp.life -= 0.03;
+                if (exp.life <= 0) explosions.splice(i, 1);
+            });
         }
 
         function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // FONDO
+            ctx.fillStyle = '#05070b';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // ESTRELLAS
+            ctx.fillStyle = '#ffffff';
+            stars.forEach(s => {
+                ctx.globalAlpha = 0.4 + Math.random() * 0.4;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+
+            if (!gameRunning) return;
+
+            // NAVE JUGADOR
             ctx.font = "38px sans-serif";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText("🤖", player.x + player.width / 2, player.y + player.height / 2);
+            ctx.fillText("🚀", player.x + player.width / 2, player.y + player.height / 2);
 
+            // BALAS
             ctx.fillStyle = "#ff0055";
             ctx.shadowBlur = 10;
             ctx.shadowColor = "#ff0055";
-            bullets.forEach(b => ctx.fillRect(b.x, b.y, b.width, b.height));
-
-            enemies.forEach(e => {
-                ctx.fillText("🛸", e.x + e.width / 2, e.y + e.height / 2);
+            bullets.forEach(b => {
+                ctx.fillRect(b.x, b.y, b.width, b.height);
             });
 
+            // ENEMIGOS SEGÚN TIPO
+            ctx.shadowBlur = 8;
+            enemies.forEach(e => {
+                if (e.type === 'normal') { ctx.fillText("🛸", e.x + e.width / 2, e.y + e.height / 2); }
+                else if (e.type === 'fast') { ctx.fillText("👾", e.x + e.width / 2, e.y + e.height / 2); }
+                else if (e.type === 'big') { ctx.fillText("👹", e.x + e.width / 2, e.y + e.height / 2); }
+            });
+
+            // EXPLOSIONES
             ctx.shadowBlur = 0;
+            explosions.forEach(exp => {
+                ctx.globalAlpha = exp.life;
+                ctx.fillStyle = exp.color;
+                ctx.beginPath();
+                ctx.arc(exp.x, exp.y, exp.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
         }
 
         function gameLoop() {
