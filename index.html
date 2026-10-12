@@ -6,14 +6,14 @@
     <title>WorkLink - Comunicación y Control Operativo</title>
     <style>
         :root {
-            --primary-color: #0f172a;
-            --accent-color: #2563eb;
-            --accent-hover: #1d4ed8;
-            --danger-color: #dc2626;
-            --success-color: #16a34a;
-            --bg-chat: #f8fafc;
-            --text-main: #334155;
-            --text-light: #64748b;
+            --primary-color: #075e54; /* Verde oscuro clásico de WhatsApp */
+            --accent-color: #25d366; /* Verde brillante de WhatsApp */
+            --accent-hover: #1ebe5d; /* Verde hover */
+            --danger-color: #ea4335; /* Rojo alerta */
+            --success-color: #25d366; /* Verde éxito */
+            --bg-chat: #efeae2; /* Fondo de chat clásico estilo WhatsApp Web */
+            --text-main: #111b21;
+            --text-light: #667781;
         }
 
         * {
@@ -24,10 +24,10 @@
         }
 
         body {
-            background-color: #090d16;
+            background-color: #111b21;
             background-image: 
-                linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
-                repeating-linear-gradient(45deg, #1e293b 0, #1e293b 1px, transparent 0, transparent 50px);
+                linear-gradient(rgba(11, 20, 26, 0.92), rgba(11, 20, 26, 0.92)),
+                repeating-linear-gradient(45deg, #1f2c34 0, #1f2c34 1px, transparent 0, transparent 40px);
             background-size: cover;
             height: 100vh;
             display: flex;
@@ -38,11 +38,10 @@
             overflow: hidden;
         }
 
-        /* Fondo decorativo corporativo tipo marca de agua dinámico */
         body::after {
             content: attr(data-watermark);
             position: absolute;
-            font-size: 6rem;
+            font-size: 5rem;
             font-weight: 900;
             color: rgba(255, 255, 255, 0.015);
             width: 200%;
@@ -55,31 +54,30 @@
 
         .app-container {
             width: 100%;
-            max-width: 1100px;
-            height: 90vh;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            max-width: 1150px;
+            height: 92vh;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             display: flex;
             overflow: hidden;
             z-index: 1;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         /* BARRA LATERAL */
         .sidebar {
-            width: 340px;
-            background: #f1f5f9;
-            border-right: 1px solid #e2e8f0;
+            width: 380px;
+            background: #ffffff;
+            border-right: 1px solid #e9edef;
             display: flex;
             flex-direction: column;
         }
 
         .sidebar-header {
-            padding: 20px;
-            background: var(--primary-color);
-            color: white;
+            padding: 16px;
+            background: #f0f2f5;
+            border-bottom: 1px solid #e9edef;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -98,54 +96,57 @@
         }
 
         .avatar {
-            width: 45px;
-            height: 45px;
-            background: var(--accent-color);
+            width: 44px;
+            height: 44px;
+            background: var(--primary-color);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
             color: white;
-            font-size: 1.1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
         }
 
         .user-info h3 {
             font-size: 0.95rem;
             font-weight: 600;
+            color: var(--text-main);
         }
 
         .user-info span {
             font-size: 0.75rem;
-            color: #38bdf8;
+            color: #00a884;
             display: flex;
             align-items: center;
             gap: 4px;
+            font-weight: 500;
         }
 
         .user-info span::before {
             content: '';
-            width: 8px;
-            height: 8px;
-            background: var(--success-color);
+            width: 7px;
+            height: 7px;
+            background: #00a884;
             border-radius: 50%;
             display: inline-block;
         }
 
         .btn-config {
-            background: rgba(255,255,255,0.1);
+            background: #e9edef;
             border: none;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 6px;
+            color: #3b4a54;
+            padding: 6px 12px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
             transition: background 0.2s;
         }
 
         .btn-config:hover {
-            background: rgba(255,255,255,0.2);
+            background: #d1d7db;
         }
 
         .actions-top {
@@ -158,50 +159,52 @@
             background: var(--danger-color);
             color: white;
             border: none;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 9px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             font-size: 0.8rem;
-            transition: background 0.2s;
+            transition: opacity 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
+            box-shadow: 0 2px 4px rgba(234, 67, 53, 0.3);
         }
 
         .btn-sos:hover {
-            background: #b91c1c;
+            opacity: 0.9;
         }
 
         .btn-bitacora {
             flex: 1;
-            background: #475569;
+            background: #3b4a54;
             color: white;
             border: none;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 9px;
+            border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
             font-size: 0.8rem;
-            transition: background 0.2s;
+            transition: opacity 0.2s;
         }
 
         .btn-bitacora:hover {
-            background: #334155;
+            opacity: 0.9;
         }
 
         .channels-list {
             flex: 1;
             overflow-y: auto;
-            padding: 10px;
+            background: #ffffff;
+            padding: 8px;
         }
 
         .channel-item {
-            padding: 12px 15px;
+            padding: 12px 14px;
             border-radius: 8px;
             cursor: pointer;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             transition: background 0.2s;
             display: flex;
             flex-direction: column;
@@ -209,22 +212,21 @@
         }
 
         .channel-item:hover {
-            background: #e2e8f0;
+            background: #f5f6f6;
         }
 
         .channel-item.active {
-            background: #e0f2fe;
-            border-left: 4px solid var(--accent-color);
+            background: #f0f2f5;
         }
 
         .channel-name {
             font-weight: 600;
-            color: var(--primary-color);
-            font-size: 0.9rem;
+            color: var(--text-main);
+            font-size: 0.95rem;
         }
 
         .channel-preview {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-light);
             white-space: nowrap;
             overflow: hidden;
@@ -237,20 +239,38 @@
             display: flex;
             flex-direction: column;
             background: var(--bg-chat);
+            position: relative;
+            background-image: radial-gradient(circle, rgba(0,0,0,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
         .chat-header {
-            padding: 15px 25px;
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 20px;
+            background: #f0f2f5;
+            border-bottom: 1px solid #e9edef;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .chat-title h2 {
-            font-size: 1.1rem;
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-back {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
             color: var(--primary-color);
+        }
+
+        .chat-title h2 {
+            font-size: 1rem;
+            color: var(--text-main);
         }
 
         .chat-title p {
@@ -264,66 +284,65 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .message {
             max-width: 70%;
-            padding: 10px 14px;
-            border-radius: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
             font-size: 0.9rem;
             position: relative;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 0.5px rgba(0,0,0,0.13);
             animation: fadeIn 0.2s ease;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
+            from { opacity: 0; transform: translateY(4px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .message.incoming {
-            background: white;
+            background: #ffffff;
             align-self: flex-start;
-            border-top-left-radius: 2px;
-            border: 1px solid #e2e8f0;
+            border-top-left-radius: 0;
         }
 
         .message.outgoing {
-            background: #e0f2fe;
+            background: #d9fdd3; /* Verde claro característico de mensajes salientes de WhatsApp */
             align-self: flex-end;
-            border-top-right-radius: 2px;
-            border: 1px solid #bae6fd;
+            border-top-right-radius: 0;
         }
 
         .message.alert-msg {
-            background: #fee2e2;
-            border: 1px solid #fca5a5;
-            color: #991b1b;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
             max-width: 85%;
             align-self: center;
             text-align: center;
             font-weight: 500;
+            border-radius: 8px;
         }
 
         .msg-sender {
             font-size: 0.75rem;
             font-weight: bold;
-            color: var(--accent-color);
-            margin-bottom: 3px;
+            color: #005c4b;
+            margin-bottom: 2px;
         }
 
         .msg-time {
             font-size: 0.65rem;
-            color: var(--text-light);
+            color: #667781;
             text-align: right;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .chat-input-area {
-            padding: 15px 20px;
-            background: white;
-            border-top: 1px solid #e2e8f0;
+            padding: 12px 16px;
+            background: #f0f2f5;
+            border-top: 1px solid #e9edef;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -331,16 +350,14 @@
 
         .chat-input-area input {
             flex: 1;
-            padding: 12px 16px;
-            border: 1px solid #cbd5e1;
+            padding: 11px 16px;
+            background: #ffffff;
+            border: none;
             border-radius: 8px;
             outline: none;
             font-size: 0.9rem;
-            transition: border-color 0.2s;
-        }
-
-        .chat-input-area input:focus {
-            border-color: var(--accent-color);
+            color: var(--text-main);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .btn-action-icon {
@@ -348,15 +365,14 @@
             border: none;
             font-size: 1.2rem;
             cursor: pointer;
-            padding: 8px;
+            padding: 6px;
             border-radius: 50%;
-            transition: background 0.2s;
             color: var(--text-light);
+            transition: color 0.2s;
         }
 
         .btn-action-icon:hover {
-            background: #f1f5f9;
-            color: var(--accent-color);
+            color: var(--primary-color);
         }
 
         .btn-send {
@@ -367,6 +383,8 @@
             border-radius: 8px;
             font-weight: bold;
             cursor: pointer;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 4px rgba(37, 211, 102, 0.3);
             transition: background 0.2s;
         }
 
@@ -374,7 +392,7 @@
             background: var(--accent-hover);
         }
 
-        /* MODALES GENERALES */
+        /* MODALES */
         .modal {
             display: none;
             position: fixed;
@@ -382,22 +400,23 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(11, 20, 26, 0.7);
             justify-content: center;
             align-items: center;
-            z-index: 10;
+            z-index: 20;
+            padding: 15px;
         }
 
         .modal-content {
             background: white;
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 16px;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -406,18 +425,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e9edef;
             padding-bottom: 10px;
         }
 
         .modal-header h3 {
             color: var(--primary-color);
+            font-size: 1.1rem;
         }
 
         .close-modal {
             background: none;
             border: none;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             cursor: pointer;
             color: var(--text-light);
         }
@@ -425,7 +445,7 @@
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
         }
 
         .form-group label {
@@ -436,10 +456,15 @@
 
         .form-group input, .form-group select, .form-group textarea {
             padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
+            border: 1px solid #d1d7db;
+            border-radius: 8px;
             font-size: 0.9rem;
             outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--accent-color);
         }
 
         .form-group textarea {
@@ -454,30 +479,53 @@
         }
 
         .btn-secondary {
-            background: #e2e8f0;
+            background: #e9edef;
             color: var(--text-main);
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 9px 16px;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
+            font-size: 0.85rem;
         }
 
+        /* RESPONSIVE PARA CELULARES */
         @media (max-width: 768px) {
+            body {
+                height: 100vh;
+                background-color: #ffffff;
+            }
             .app-container {
                 height: 100vh;
                 max-width: 100%;
                 border-radius: 0;
+                border: none;
+                box-shadow: none;
             }
             .sidebar {
-                width: 260px;
+                width: 100%;
+                height: 100%;
+            }
+            .main-content {
+                display: none;
+                width: 100%;
+                height: 100%;
+            }
+            .app-container.chat-active .sidebar {
+                display: none;
+            }
+            .app-container.chat-active .main-content {
+                display: flex;
+            }
+            .btn-back {
+                display: inline-block;
             }
         }
     </style>
 </head>
-<body data-watermark="EQUIPO DE TRABAJO • COMUNICACIÓN • GESTIÓN OPERATIVA">
+<body data-watermark="WORKLINK • COMUNICACIÓN OPERATIVA">
 
-    <div class="app-container">
+    <div class="app-container" id="appContainer">
         <!-- BARRA LATERAL -->
         <div class="sidebar">
             <div class="sidebar-header">
@@ -489,7 +537,7 @@
                             <span>En línea</span>
                         </div>
                     </div>
-                    <button class="btn-config" onclick="openConfigModal()" title="Configurar aplicación">⚙️ Editar</button>
+                    <button class="btn-config" onclick="openConfigModal()">⚙️ Editar</button>
                 </div>
                 <div class="actions-top">
                     <button class="btn-sos" onclick="triggerSOS()">🚨 ALERTA</button>
@@ -502,12 +550,15 @@
             </div>
         </div>
 
-        <!-- ÁREA CENTRAL (CHAT) -->
+        <!-- ÁREA PRINCIPAL (CHAT) -->
         <div class="main-content">
             <div class="chat-header">
-                <div class="chat-title">
-                    <h2 id="currentChannelName">Canal General</h2>
-                    <p id="currentChannelDesc">Coordinación general del equipo de trabajo</p>
+                <div class="chat-header-left">
+                    <button class="btn-back" onclick="goBackToSidebar()">⬅</button>
+                    <div class="chat-title">
+                        <h2 id="currentChannelName">Canal General</h2>
+                        <p id="currentChannelDesc">Coordinación general del equipo</p>
+                    </div>
                 </div>
             </div>
 
@@ -516,9 +567,9 @@
             </div>
 
             <div class="chat-input-area">
-                <button class="btn-action-icon" title="Compartir ubicación" onclick="sendQuickAction('📍 Ubicación actual compartida en terreno')">📍</button>
-                <button class="btn-action-icon" title="Adjuntar archivo o foto" onclick="sendQuickAction('📷 [Archivo / Evidencia Adjunta]')">📷</button>
-                <input type="text" id="messageInput" placeholder="Escribe un mensaje al equipo..." onkeypress="checkEnter(event)">
+                <button class="btn-action-icon" title="Ubicación" onclick="sendQuickAction('📍 Ubicación actual compartida')">📍</button>
+                <button class="btn-action-icon" title="Foto/Archivo" onclick="sendQuickAction('📷 [Evidencia adjunta]')">📷</button>
+                <input type="text" id="messageInput" placeholder="Escribe un mensaje..." onkeypress="checkEnter(event)">
                 <button class="btn-send" onclick="sendMessage()">Enviar</button>
             </div>
         </div>
@@ -528,7 +579,7 @@
     <div class="modal" id="reportModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Registro de Novedades / Minuta</h3>
+                <h3>Registro de Novedades</h3>
                 <button class="close-modal" onclick="closeReportModal()">&times;</button>
             </div>
             <div class="form-group">
@@ -537,12 +588,12 @@
                     <option value="Reporte de Actividad">Reporte de Actividad Realizada</option>
                     <option value="Incidencia / Problema">Incidencia / Problema Detectado</option>
                     <option value="Ingreso / Proveedor">Visita / Proveedor / Insumo</option>
-                    <option value="Anotación General">Anotación General de Turno</option>
+                    <option value="Anotación General">Anotación General</option>
                 </select>
             </div>
             <div class="form-group">
                 <label>Detalle de la novedad</label>
-                <textarea id="reportDescription" placeholder="Describa los detalles relevantes, estado o acciones tomadas..."></textarea>
+                <textarea id="reportDescription" placeholder="Describa los detalles relevantes..."></textarea>
             </div>
             <div class="modal-footer">
                 <button class="btn-secondary" onclick="closeReportModal()">Cancelar</button>
@@ -551,7 +602,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE CONFIGURACIÓN Y PERSONALIZACIÓN -->
+    <!-- MODAL DE CONFIGURACIÓN -->
     <div class="modal" id="configModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -559,19 +610,19 @@
                 <button class="close-modal" onclick="closeConfigModal()">&times;</button>
             </div>
             <div class="form-group">
-                <label>Nombre de tu Negocio / Empresa / Área</label>
-                <input type="text" id="inputCompanyName" placeholder="Ej: Minimarket Don Juan, Taller Mecánico, etc.">
+                <label>Nombre de tu Negocio / Empresa</label>
+                <input type="text" id="inputCompanyName" placeholder="Ej: Mi Negocio, Taller, etc.">
             </div>
             <div class="form-group">
                 <label>Tu Nombre o Tu Cargo</label>
-                <input type="text" id="inputUserName" placeholder="Ej: Juan Pérez / Administrador">
+                <input type="text" id="inputUserName" placeholder="Ej: Loreto / Administradora">
             </div>
             <div class="form-group">
-                <label>Nombre del Canal 1 (Principal)</label>
+                <label>Nombre del Canal 1</label>
                 <input type="text" id="inputChannel1" placeholder="Ej: 🛒 Ventas y Caja">
             </div>
             <div class="form-group">
-                <label>Nombre del Canal 2 (Secundario)</label>
+                <label>Nombre del Canal 2</label>
                 <input type="text" id="inputChannel2" placeholder="Ej: 📦 Bodega y Stock">
             </div>
             <div class="modal-footer">
@@ -582,7 +633,6 @@
     </div>
 
     <script>
-        // Datos de la aplicación (guardados en localStorage si existen)
         let appConfig = JSON.parse(localStorage.getItem('worklink_config')) || {
             companyName: "CENTRO DE TRABAJO",
             userName: "Colaborador",
@@ -591,12 +641,12 @@
         };
 
         let channels = [
-            { id: 'general', name: appConfig.channel1Name, desc: 'Comunicación general del equipo de trabajo', messages: [
-                { sender: 'Supervisor', text: 'Bienvenidos al sistema de coordinación interna.', time: '08:00', type: 'incoming' },
+            { id: 'general', name: appConfig.channel1Name, desc: 'Comunicación general del equipo', messages: [
+                { sender: 'Supervisor', text: 'Bienvenidos al sistema de coordinación.', time: '08:00', type: 'incoming' },
                 { sender: 'Colaborador', text: 'Todo listo por aquí.', time: '08:05', type: 'outgoing' }
             ]},
-            { id: 'secundario', name: appConfig.channel2Name, desc: 'Coordinación específica de tareas o inventario', messages: [
-                { sender: 'Sistema', text: 'Canal secundario habilitado para reportes.', time: '08:10', type: 'incoming' }
+            { id: 'secundario', name: appConfig.channel2Name, desc: 'Coordinación específica de tareas', messages: [
+                { sender: 'Sistema', text: 'Canal secundario habilitado.', time: '08:10', type: 'incoming' }
             ]},
             { id: 'emergencias', name: '🚨 Urgencias / Alertas', desc: 'Canal exclusivo para avisos críticos', messages: [
                 { sender: 'Sistema', text: 'Canal de alerta rápida listo.', time: '08:00', type: 'incoming' }
@@ -610,7 +660,6 @@
             document.getElementById('userAvatar').innerText = appConfig.userName.substring(0, 2).toUpperCase();
             document.body.setAttribute('data-watermark', `${appConfig.companyName} • COMUNICACIÓN • GESTIÓN`);
             
-            // Actualizar nombres en los canales si cambiaron en config
             channels[0].name = appConfig.channel1Name;
             channels[1].name = appConfig.channel2Name;
 
@@ -643,6 +692,11 @@
             document.getElementById('currentChannelDesc').innerText = channel.desc;
             renderChannels();
             renderMessages();
+            document.getElementById('appContainer').classList.add('chat-active');
+        }
+
+        function goBackToSidebar() {
+            document.getElementById('appContainer').classList.remove('chat-active');
         }
 
         function renderMessages() {
@@ -702,14 +756,14 @@
         }
 
         function triggerSOS() {
-            if (confirm("¿Deseas enviar una alerta general de urgencia al equipo?")) {
+            if (confirm("¿Deseas enviar una alerta general de urgencia?")) {
                 const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 activeChannelId = 'emergencias';
                 const emergencyChannel = channels.find(c => c.id === 'emergencias');
                 
                 emergencyChannel.messages.push({
                     sender: appConfig.userName,
-                    text: '¡ATENCIÓN: Se requiere asistencia o revisión urgente en mi área!',
+                    text: '¡ATENCIÓN: Se requiere asistencia urgente en mi área!',
                     time: timeNow,
                     type: 'alert'
                 });
@@ -723,7 +777,6 @@
             }
         }
 
-        // Manejo del Modal de Registro
         function openReportModal() {
             document.getElementById('reportModal').style.display = 'flex';
         }
@@ -755,7 +808,6 @@
             switchChannel('general');
         }
 
-        // Manejo del Modal de Configuración
         function openConfigModal() {
             document.getElementById('inputCompanyName').value = appConfig.companyName;
             document.getElementById('inputUserName').value = appConfig.userName;
@@ -784,7 +836,6 @@
             initApp();
         }
 
-        // Iniciar al cargar
         initApp();
     </script>
 </body>
