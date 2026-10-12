@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkLink - Comunicación y Control Operativo</title>
+    <style>
+        :root {
+            --primary-color: #0f172a;
+            --accent-color: #2563eb;
+            --accent-hover: #1d4ed8;
+            --danger-color: #dc2626;
+            --success-color: #16a34a;
+            --bg-chat: #f8fafc;
+            --text-main: #334155;
+            --text-light: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #090d16;
+            background-image: 
+                linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.88)),
+                repeating-linear-gradient(45deg, #1e293b 0, #1e293b 1px, transparent 0, transparent 50px);
+            background-size: cover;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-main);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Fondo decorativo corporativo tipo marca de agua dinámico */
+        body::after {
+            content: attr(data-watermark);
+            position: absolute;
+            font-size: 6rem;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.015);
+            width: 200%;
+            text-align: center;
+            transform: rotate(-25deg);
+            pointer-events: none;
+            z-index: 0;
+            line-height: 1.2;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1100px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            overflow: hidden;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* BARRA LATERAL */
+        .sidebar {
+            width: 340px;
+            background: #f1f5f9;
+            border-right: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-profile-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .user-info h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .user-info span {
+            font-size: 0.75rem;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .user-info span::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--success-color);
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .btn-config {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+
+        .btn-config:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .actions-top {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sos {
+            flex: 1;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-sos:hover {
+            background: #b91c1c;
+        }
+
+        .btn-bitacora {
+            flex: 1;
+            background: #475569;
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s;
+        }
+
+        .btn-bitacora:hover {
+            background: #334155;
+        }
+
+        .channels-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .channel-item {
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 6px;
+            transition: background 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .channel-item:hover {
+            background: #e2e8f0;
+        }
+
+        .channel-item.active {
+            background: #e0f2fe;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .channel-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+        }
+
+        .channel-preview {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ÁREA PRINCIPAL (CHAT) */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-chat);
+        }
+
+        .chat-header {
+            padding: 15px 25px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-title h2 {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        .chat-title p {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.incoming {
+            background: white;
+            align-self: flex-start;
+            border-top-left-radius: 2px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .message.outgoing {
+            background: #e0f2fe;
+            align-self: flex-end;
+            border-top-right-radius: 2px;
+            border: 1px solid #bae6fd;
+        }
+
+        .message.alert-msg {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            color: #991b1b;
+            max-width: 85%;
+            align-self: center;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .msg-sender {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 3px;
+        }
+
+        .msg-time {
+            font-size: 0.65rem;
+            color: var(--text-light);
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .chat-input-area {
+            padding: 15px 20px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input-area input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .btn-action-icon {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background 0.2s;
+            color: var(--text-light);
+        }
+
+        .btn-action-icon:hover {
+            background: #f1f5f9;
+            color: var(--accent-color);
+        }
+
+        .btn-send {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-send:hover {
+            background: var(--accent-hover);
+        }
+
+        /* MODALES GENERALES */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .modal-content {
+            background: white;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .modal-header h3 {
+            color: var(--primary-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 90px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text-main);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                height: 100vh;
+                max-width: 100%;
+                border-radius: 0;
+            }
+            .sidebar {
+                width: 260px;
+            }
+        }
+    </style>
+</head>
+<body data-watermark="EQUIPO DE TRABAJO • COMUNICACIÓN • GESTIÓN OPERATIVA">
+
+    <div class="app-container">
+        <!-- BARRA LATERAL -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <div class="user-profile-left">
+                        <div class="avatar" id="userAvatar">ET</div>
+                        <div class="user-info">
+                            <h3 id="displayUserName">Colaborador</h3>
+                            <span>En línea</span>
+                        </div>
+                    </div>
+                    <button class="btn-config" onclick="openConfigModal()" title="Configurar aplicación">⚙️ Editar</button>
+                </div>
+                <div class="actions-top">
+                    <button class="btn-sos" onclick="triggerSOS()">🚨 ALERTA</button>
+                    <button class="btn-bitacora" onclick="openReportModal()">📋 Registro</button>
+                </div>
+            </div>
+
+            <div class="channels-list" id="channelsList">
+                <!-- Se llena mediante JavaScript -->
+            </div>
+        </div>
+
+        <!-- ÁREA CENTRAL (CHAT) -->
+        <div class="main-content">
+            <div class="chat-header">
+                <div class="chat-title">
+                    <h2 id="currentChannelName">Canal General</h2>
+                    <p id="currentChannelDesc">Coordinación general del equipo de trabajo</p>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <!-- Los mensajes aparecerán aquí -->
+            </div>
+
+            <div class="chat-input-area">
+                <button class="btn-action-icon" title="Compartir ubicación" onclick="sendQuickAction('📍 Ubicación actual compartida en terreno')">📍</button>
+                <button class="btn-action-icon" title="Adjuntar archivo o foto" onclick="sendQuickAction('📷 [Archivo / Evidencia Adjunta]')">📷</button>
+                <input type="text" id="messageInput" placeholder="Escribe un mensaje al equipo..." onkeypress="checkEnter(event)">
+                <button class="btn-send" onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE REGISTRO / BITÁCORA -->
+    <div class="modal" id="reportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Registro de Novedades / Minuta</h3>
+                <button class="close-modal" onclick="closeReportModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Tipo de Registro</label>
+                <select id="reportType">
+                    <option value="Reporte de Actividad">Reporte de Actividad Realizada</option>
+                    <option value="Incidencia / Problema">Incidencia / Problema Detectado</option>
+                    <option value="Ingreso / Proveedor">Visita / Proveedor / Insumo</option>
+                    <option value="Anotación General">Anotación General de Turno</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Detalle de la novedad</label>
+                <textarea id="reportDescription" placeholder="Describa los detalles relevantes, estado o acciones tomadas..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeReportModal()">Cancelar</button>
+                <button class="btn-send" onclick="submitReport()">Guardar y Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIGURACIÓN Y PERSONALIZACIÓN -->
+    <div class="modal" id="configModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Personalizar Aplicación</h3>
+                <button class="close-modal" onclick="closeConfigModal()">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Nombre de tu Negocio / Empresa / Área</label>
+                <input type="text" id="inputCompanyName" placeholder="Ej: Minimarket Don Juan, Taller Mecánico, etc.">
+            </div>
+            <div class="form-group">
+                <label>Tu Nombre o Tu Cargo</label>
+                <input type="text" id="inputUserName" placeholder="Ej: Juan Pérez / Administrador">
+            </div>
+            <div class="form-group">
+                <label>Nombre del Canal 1 (Principal)</label>
+                <input type="text" id="inputChannel1" placeholder="Ej: 🛒 Ventas y Caja">
+            </div>
+            <div class="form-group">
+                <label>Nombre del Canal 2 (Secundario)</label>
+                <input type="text" id="inputChannel2" placeholder="Ej: 📦 Bodega y Stock">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeConfigModal()">Cancelar</button>
+                <button class="btn-send" onclick="saveConfiguration()">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de la aplicación (guardados en localStorage si existen)
+        let appConfig = JSON.parse(localStorage.getItem('worklink_config')) || {
+            companyName: "CENTRO DE TRABAJO",
+            userName: "Colaborador",
+            channel1Name: "📢 Canal General",
+            channel2Name: "📦 Logística / Stock"
+        };
+
+        let channels = [
+            { id: 'general', name: appConfig.channel1Name, desc: 'Comunicación general del equipo de trabajo', messages: [
+                { sender: 'Supervisor', text: 'Bienvenidos al sistema de coordinación interna.', time: '08:00', type: 'incoming' },
+                { sender: 'Colaborador', text: 'Todo listo por aquí.', time: '08:05', type: 'outgoing' }
+            ]},
+            { id: 'secundario', name: appConfig.channel2Name, desc: 'Coordinación específica de tareas o inventario', messages: [
+                { sender: 'Sistema', text: 'Canal secundario habilitado para reportes.', time: '08:10', type: 'incoming' }
+            ]},
+            { id: 'emergencias', name: '🚨 Urgencias / Alertas', desc: 'Canal exclusivo para avisos críticos', messages: [
+                { sender: 'Sistema', text: 'Canal de alerta rápida listo.', time: '08:00', type: 'incoming' }
+            ]}
+        ];
+
+        let activeChannelId = 'general';
+
+        function initApp() {
+            document.getElementById('displayUserName').innerText = appConfig.userName;
+            document.getElementById('userAvatar').innerText = appConfig.userName.substring(0, 2).toUpperCase();
+            document.body.setAttribute('data-watermark', `${appConfig.companyName} • COMUNICACIÓN • GESTIÓN`);
+            
+            // Actualizar nombres en los canales si cambiaron en config
+            channels[0].name = appConfig.channel1Name;
+            channels[1].name = appConfig.channel2Name;
+
+            renderChannels();
+            renderMessages();
+        }
+
+        function renderChannels() {
+            const list = document.getElementById('channelsList');
+            list.innerHTML = '';
+            channels.forEach(ch => {
+                const lastMsg = ch.messages[ch.messages.length - 1];
+                const preview = lastMsg ? `${lastMsg.sender}: ${lastMsg.text}` : 'Sin mensajes';
+                
+                const div = document.createElement('div');
+                div.className = `channel-item ${ch.id === activeChannelId ? 'active' : ''}`;
+                div.onclick = () => switchChannel(ch.id);
+                div.innerHTML = `
+                    <div class="channel-name">${ch.name}</div>
+                    <div class="channel-preview">${preview}</div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function switchChannel(id) {
+            activeChannelId = id;
+            const channel = channels.find(c => c.id === id);
+            document.getElementById('currentChannelName').innerText = channel.name;
+            document.getElementById('currentChannelDesc').innerText = channel.desc;
+            renderChannels();
+            renderMessages();
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+            const channel = channels.find(c => c.id === activeChannelId);
+
+            channel.messages.forEach(msg => {
+                const div = document.createElement('div');
+                if (msg.type === 'alert') {
+                    div.className = 'message alert-msg';
+                    div.innerHTML = `<strong>⚠️ AVISO URGENTE ⚠️</strong><br>${msg.text}<div class="msg-time">${msg.time}</div>`;
+                } else {
+                    div.className = `message ${msg.type}`;
+                    div.innerHTML = `
+                        ${msg.type === 'incoming' ? `<div class="msg-sender">${msg.sender}</div>` : ''}
+                        <div>${msg.text}</div>
+                        <div class="msg-time">${msg.time}</div>
+                    `;
+                }
+                container.appendChild(div);
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const channel = channels.find(c => c.id === activeChannelId);
+
+            channel.messages.push({
+                sender: appConfig.userName,
+                text: text,
+                time: timeNow,
+                type: 'outgoing'
+            });
+
+            input.value = '';
+            renderMessages();
+            renderChannels();
+        }
+
+        function sendQuickAction(actionText) {
+            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const channel = channels.find(c => c.id === activeChannelId);
+            channel.messages.push({
+                sender: appConfig.userName,
+                text: actionText,
+                time: timeNow,
+                type: 'outgoing'
+            });
+            renderMessages();
+            renderChannels();
+        }
+
+        function triggerSOS() {
+            if (confirm("¿Deseas enviar una alerta general de urgencia al equipo?")) {
+                const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                activeChannelId = 'emergencias';
+                const emergencyChannel = channels.find(c => c.id === 'emergencias');
+                
+                emergencyChannel.messages.push({
+                    sender: appConfig.userName,
+                    text: '¡ATENCIÓN: Se requiere asistencia o revisión urgente en mi área!',
+                    time: timeNow,
+                    type: 'alert'
+                });
+                switchChannel('emergencias');
+            }
+        }
+
+        function checkEnter(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Manejo del Modal de Registro
+        function openReportModal() {
+            document.getElementById('reportModal').style.display = 'flex';
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').style.display = 'none';
+        }
+
+        function submitReport() {
+            const type = document.getElementById('reportType').value;
+            const desc = document.getElementById('reportDescription').value.trim();
+            if (!desc) {
+                alert("Por favor escribe una descripción.");
+                return;
+            }
+
+            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const channel = channels.find(c => c.id === 'general');
+
+            channel.messages.push({
+                sender: `${appConfig.userName} (Registro)`,
+                text: `📋 <strong>[${type.toUpperCase()}]</strong><br>${desc}`,
+                time: timeNow,
+                type: 'outgoing'
+            });
+
+            document.getElementById('reportDescription').value = '';
+            closeReportModal();
+            switchChannel('general');
+        }
+
+        // Manejo del Modal de Configuración
+        function openConfigModal() {
+            document.getElementById('inputCompanyName').value = appConfig.companyName;
+            document.getElementById('inputUserName').value = appConfig.userName;
+            document.getElementById('inputChannel1').value = appConfig.channel1Name;
+            document.getElementById('inputChannel2').value = appConfig.channel2Name;
+            document.getElementById('configModal').style.display = 'flex';
+        }
+
+        function closeConfigModal() {
+            document.getElementById('configModal').style.display = 'none';
+        }
+
+        function saveConfiguration() {
+            const comp = document.getElementById('inputCompanyName').value.trim();
+            const user = document.getElementById('inputUserName').value.trim();
+            const ch1 = document.getElementById('inputChannel1').value.trim();
+            const ch2 = document.getElementById('inputChannel2').value.trim();
+
+            if (comp) appConfig.companyName = comp;
+            if (user) appConfig.userName = user;
+            if (ch1) appConfig.channel1Name = ch1;
+            if (ch2) appConfig.channel2Name = ch2;
+
+            localStorage.setItem('worklink_config', JSON.stringify(appConfig));
+            closeConfigModal();
+            initApp();
+        }
+
+        // Iniciar al cargar
+        initApp();
+    </script>
+</body>
+</html>
+
